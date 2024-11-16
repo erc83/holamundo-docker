@@ -1,0 +1,67 @@
+pipeline {
+    agent any
+    
+    environment {
+        // Configurar la variable para el uso de Docker
+        DOCKER_CLI_EXPERIMENTAL = 'enabled'  // Habilitar características experimentales si es necesario
+    }
+
+    stages {
+        stage('Checkout Code') {
+            steps {
+                    echo 'git'
+                    // Clonar el repositorio de Git
+                    git branch:'main', url: 'https://github.com/erc83/holamundo-docker.git'
+            }
+        }
+        
+        
+        stage('Terraform Init') {
+            steps {
+                    echo 'terraform init'
+                    // Inicializar y aplicar Terraform para preparar el entorno
+                    bat 'terraform init'
+            }
+        }
+
+        stage('Terraform Init & Apply') {
+            steps {
+                    echo 'terraform apply'
+                    bat 'terraform apply -auto-approve'  // Utiliza -auto-approve para evitar la confirmación interactiva
+            }
+        }
+
+        stage('Run Docker Compose') {
+            steps {
+                script {
+                    // Levantar los contenedores con Docker Compose
+                    bat 'docker-compose -f %WORKSPACE%\\docker-compose.yml up -d'
+                }
+            }
+        }
+
+        stage('Post-Deployment Cleanup') {
+            steps {
+                script {
+                    // Verificar los contenedores que están corriendo
+                    bat 'docker ps'
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Deployment successful!'
+        }
+        
+        failure {
+            echo 'There was an issue with the deployment.'
+        }
+        
+        always {
+            // Acciones de limpieza siempre se ejecutan
+            echo 'Cleaning up...'
+        }
+    }
+}
