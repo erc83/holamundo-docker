@@ -41,7 +41,7 @@ mongodb://localhost:27017
 
 
 
-## 2da forma Para ejecutar con terraform de forma local en windows es necesario tener instalado terrafor
+## 2da forma Para ejecutar con terraform de forma local en windows es necesario tener instalado terraform
 
 
 1. clonar el repositorio
@@ -90,7 +90,7 @@ mongodb://localhost:27017
 
 3. Ejecutar el pipeline
 
-    - 
+    - en el servidor de jenkins
 
 4. navegar a las siguientes url en tu navegador  donde esta el front de la aplicacion y agregar los games que recuerdes
 nota: por defecto el puerto 80 se llama directamente 
