@@ -23,18 +23,18 @@ services:
                                       # Ya que nos conectamos dentro de la misma red de docker  el nombre de la base de datos gamify
     depends_on:
       - db
-  api-tests:                        # No queremos que se contruya esta imagen sino que reutilice una que existe
-    image: holamundo-api            # la imagen que va a reutilizar         nombreDirectorio_guion_nombreServicio
-    #ports:                           No vamos a utilizar el puerto
-    #  - 3000:3000                  
-    environment:                      # Si el test tiene coneccion a la base de datos puede quedar en la misma o cambiar la base de datos
-      DB_URL: mongodb://db/gamifytest     #  cambiamos el nombre del test
-    volumes:                        #   El volumen no se va a cambiar, si quiero modificar el codigo del test se vea
-      - ./backend/app:/app/app      #   reflejado inmediatamente dentro de Docker    
-      - ./backend/tests:/app/tests      # Nos faltaba el volumen del directorio de tests                       
-    depends_on:                     # La dependencia a la base de datos quedo 
-      - db
-    command: npm test               # nos permite modificar el comando por defecto [npm start] del dockerfile del backend
+  #api-tests:                        # No queremos que se contruya esta imagen sino que reutilice una que existe
+  #  image: holamundo-api            # la imagen que va a reutilizar         nombreDirectorio_guion_nombreServicio
+  #  #ports:                           No vamos a utilizar el puerto
+  #  #  - 3000:3000                  
+  #  environment:                      # Si el test tiene coneccion a la base de datos puede quedar en la misma o cambiar la base de datos
+  #    DB_URL: mongodb://db/gamifytest     #  cambiamos el nombre del test
+  #  volumes:                        #   El volumen no se va a cambiar, si quiero modificar el codigo del test se vea
+  #    - ./backend/app:/app/app      #   reflejado inmediatamente dentro de Docker    
+  #    - ./backend/tests:/app/tests      # Nos faltaba el volumen del directorio de tests                       
+  #  depends_on:                     # La dependencia a la base de datos quedo 
+  #    - db
+  #  command: npm test               # nos permite modificar el comando por defecto [npm start] del dockerfile del backend
   db:                                 # referencia a la base de datos
     image: mongo:5.0.19-focal         # focal version de ubuntu pesa 100 de megas
     ports:
