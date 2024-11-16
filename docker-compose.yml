@@ -1,0 +1,48 @@
+#Antiguamente se colocaba la version    3.7.1   no es un numero
+version: "3.8"              # No es necesaria por defecto trata de usar la ultima version de docker
+
+# definir las imagenes o contenedores que vamos a ejecutar a traves de services
+services:             
+  app:                              # referencia al front end    
+    build: ./frontend               # Directorio de archivo dockerfile en el frontend
+    ports:        
+      - 80:5173                     # conectar el puerto 80 de la maquina al puerto 5173 de la aplicacion (Expose)
+    volumes:                        
+      - ./frontend/src:/app/src     # se mapea al directorio de /frontend/src:/app/src   un volumen anonimo
+    environment:
+      VITE_API_URL: http://localhost:3000
+  api:                              # referencia al backend
+    build: ./backend                # le indicamos la ruta donde se encuentra el docker-file
+    ports:
+      - 3000:3000                   #mapeo de puerto 3000:3000  ->  si queremos conectarnos a la api lo podemos hacer a traves del puerto 3000
+    volumes:                        # definir volumes
+      - ./backend/app:/app/app      # ruta desde donde nos encontramos ./backend/app:/app/app     volumen anonimo
+    environment:                      # Usando variable de entorno que utilizara el servicio de api
+      #DB_URL: mongodb://52.4..../gamify     # nombre de la variable DB_URL:      
+      DB_URL: mongodb://db/gamify     # nombre de la variable DB_URL: utilizando el servicio  db   de la base de datos
+                                      # Ya que nos conectamos dentro de la misma red de docker  el nombre de la base de datos gamify
+    depends_on:
+      - db
+  api-tests:                        # No queremos que se contruya esta imagen sino que reutilice una que existe
+    image: holamundo-api            # la imagen que va a reutilizar         nombreDirectorio_guion_nombreServicio
+    #ports:                           No vamos a utilizar el puerto
+    #  - 3000:3000                  
+    environment:                      # Si el test tiene coneccion a la base de datos puede quedar en la misma o cambiar la base de datos
+      DB_URL: mongodb://db/gamifytest     #  cambiamos el nombre del test
+    volumes:                        #   El volumen no se va a cambiar, si quiero modificar el codigo del test se vea
+      - ./backend/app:/app/app      #   reflejado inmediatamente dentro de Docker    
+      - ./backend/tests:/app/tests      # Nos faltaba el volumen del directorio de tests                       
+    depends_on:                     # La dependencia a la base de datos quedo 
+      - db
+    command: npm test               # nos permite modificar el comando por defecto [npm start] del dockerfile del backend
+  db:                                 # referencia a la base de datos
+    image: mongo:5.0.19-focal         # focal version de ubuntu pesa 100 de megas
+    ports:
+      - 27017:27017                   # mapeo de puerto primero anfitrion:puerto_contenedor a mapear
+    volumes:
+      - gamify:/data/db              # volumen donde se guardara el valor de gamify
+      #- .:/data/db                   # hace referencia a la direccion donde nos encontramos ruta del directorio
+      #- .src:/data/db                # para mapear una ruta dentro del directorio 
+
+volumes:                              # se tiene que agregar al propiedad volumes:
+  gamify:                             # nombre que tenga el volumen gamify        no es necesario indicar nada a la derecha
